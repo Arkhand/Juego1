@@ -22,7 +22,6 @@ router.get('/logout', (req, res) => {
 // @desc Pagina inicial
 // @route GET /
 router.get('/home', ensureAuth,  (req, res) => {
-    console.log(req.user)
     res.render('home', {usuario: req.user.displayName} )
 });
 

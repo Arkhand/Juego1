@@ -1,2 +1,39 @@
-
 <h3>Bienvenido {{ usuario }}</h3>
+
+<script src="p5.js"></script>
+<script src="socket.io/socket.io.js"></script>
+
+<script>
+
+    const socket =  io();
+
+    vgPersonas = [];
+
+    var user = "{{ usuario }}";
+    socket.emit('nuevoUser', {  nombre: user });
+    
+
+    function mousePos() {
+        let pos = { x : mouseX,  y : mouseY }
+        socket.emit('mov', {  mousePos: pos });
+    };
+    
+    socket.on('mov',function (personas) {
+        vgPersonas = personas;
+    });
+
+    function setup() {
+        createCanvas(600, 600);
+    }
+
+    function draw() {
+        background(0);
+        mousePos();
+        for (var i = 0; i < vgPersonas.length; i++) {
+            fill(200);
+            text(vgPersonas[i].nombre, vgPersonas[i].x, vgPersonas[i].y);
+        }
+    }
+
+
+</script>

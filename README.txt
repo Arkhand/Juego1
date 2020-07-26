@@ -38,6 +38,7 @@ PASSPORT-GOOGLE-OAUTH20
 Resumen de dependencias:
 npm i install express mongoose connect-mongo express-sessions express-handlebars dotenv method-override moment morgan passport passport-google-oauth20
 
-Para iniciar:
+Instalar tmb para iniciar en dev
 npm i -D nodemon cross-env
 
+npm i socket.io

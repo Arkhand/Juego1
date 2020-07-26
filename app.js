@@ -9,6 +9,8 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session); //para q no se caiga la seccion cada vez q reconecta
 const connectDB = require('./config/db'); //Mi Js con la funcion de coneccion a la BD
 
+const SocketIO = require('socket.io');
+
 //Para cargar la configuraciones
 dotenv.config({ path: './config/config.env' });
 
@@ -51,7 +53,58 @@ app.use('/auth', require('./routes/auth'))
 
 const PORT = process.env.PORT;
 
-app.listen(
-    PORT,
-    console.log(`Servidor en puerto ${PORT} en ambiente ${process.env.NODE_ENV}`)
+const server = app.listen(
+    PORT, () => { 
+        console.log(`Servidor en puerto ${PORT} en ambiente ${process.env.NODE_ENV}`)
+    }
 );
+
+const io = SocketIO(server);
+
+let cont = '1';
+
+var personas = [];
+
+function Persona(id,x,y){
+    this.nombre = '';
+    this.id = id;
+    this.x = x;
+    this.y = y;
+
+};
+
+io.on('connection', socket => { 
+      
+    var persona = new Persona(socket.id,300,300);
+    personas.push(persona);
+    console.log("Nueva coneccion",socket.id);
+
+    socket.on('nuevoUser', (data) => {
+        for (var i = 0; i < personas.length; i++) {
+            if (personas[i].id == socket.id) {
+                personas[i].nombre = data.nombre;
+            }
+        };
+    });
+
+    socket.on('mov', (data) => {
+        for (var i = 0; i < personas.length; i++) {
+            if (personas[i].id == socket.id) {
+                // personas[i].nombre = datIN.nombre;
+                personas[i].x = data.mousePos.x;
+                personas[i].y = data.mousePos.y;
+            };
+        };
+        io.sockets.emit('mov', personas);
+    });
+
+    socket.on('disconnect', (reason) => {
+
+        for (var i = 0; i < personas.length; i++) {
+            if (personas[i].id == socket.id) {
+                personas.splice(i, 1);
+            };
+        };
+      });
+
+});
